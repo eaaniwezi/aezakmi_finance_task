@@ -1,0 +1,32 @@
+// ignore_for_file: prefer_const_constructors
+
+import 'package:flutter/material.dart';
+import 'package:aezakmi_finance_task/const/color_theme.dart' as style;
+
+class CustomRatingBarWidget extends StatelessWidget {
+  final double percentValue;
+  CustomRatingBarWidget({required this.percentValue});
+
+  @override
+  Widget build(BuildContext context) {
+    int filledContainers = (percentValue * 10).toInt();
+    return Row(
+      children: List.generate(10, (index) {
+        bool isFilled = index < filledContainers;
+        return Container(
+          margin: EdgeInsets.only(right: 5),
+          height: 12,
+          width: 12,
+          decoration: BoxDecoration(
+            color: isFilled ? style.ColorTheme.lemonColor : Colors.white,
+            border: Border.all(
+              color: style.ColorTheme.blackColor,
+              width: 2.0,
+            ),
+            borderRadius: BorderRadius.circular(50),
+          ),
+        );
+      }),
+    );
+  }
+}
