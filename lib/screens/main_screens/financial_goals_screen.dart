@@ -24,6 +24,7 @@ class FinancialGoalsScreen extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: ListView(
               children: [
+                const SizedBox(height: 20),
                 _header(),
                 const SizedBox(height: 30),
                 goals.isEmpty
@@ -181,10 +182,10 @@ class FinancialGoalsScreen extends StatelessWidget {
 
   _header() {
     return Text(
-      "\nFinancial goals",
+      "Financial goals",
       style: GoogleFonts.spaceGrotesk(
         fontWeight: FontWeight.w700,
-        fontSize: 42,
+        fontSize: 40,
         fontStyle: FontStyle.normal,
       ),
     );

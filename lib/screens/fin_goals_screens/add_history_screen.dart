@@ -91,6 +91,7 @@ class _AddHistoryScreenState extends State<AddHistoryScreen> {
                     ),
                   ),
                   //
+                  const SizedBox(width: 10),
                   _emptyContainer(
                       context: context,
                       child: Padding(
@@ -182,7 +183,7 @@ class _AddHistoryScreenState extends State<AddHistoryScreen> {
     return Container(
       height: 116,
       // width: 163,
-      width: size.width * 0.45,
+      width: size.width * 0.42,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
@@ -246,10 +247,13 @@ class _AddHistoryScreenState extends State<AddHistoryScreen> {
   }
 
   _noHistory() {
+    Size size = MediaQuery.of(context).size;
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Image.asset("assets/pics/wallet.png"),
+        Container(
+            height: size.height * 0.28,
+            child: Image.asset("assets/pics/wallet.png")),
         _textContainer("No transactions"),
         _tapHereText("Press + to add")
       ],

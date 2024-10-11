@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -24,6 +25,7 @@ class FinancialBudgetScreen extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: ListView(
               children: [
+                const SizedBox(height: 20),
                 _header(),
                 const SizedBox(height: 15),
                 _budgetContainer(context),
@@ -49,10 +51,13 @@ class FinancialBudgetScreen extends StatelessWidget {
   }
 
   _noHistory(context) {
+    Size size = MediaQuery.of(context).size;
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Image.asset("assets/pics/wallet.png"),
+        Container(
+            height: size.height * 0.28,
+            child: Image.asset("assets/pics/wallet.png")),
         _textContainer("No transactions"),
         _dateText("Press + to add", context)
       ],
@@ -102,7 +107,8 @@ class FinancialBudgetScreen extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  "\$ ${balance}",
+                  // "\$ ${balance}",
+                  "\$ ${NumberFormat.compact().format(balance)}",
                   style: GoogleFonts.spaceGrotesk(
                     fontWeight: FontWeight.w700,
                     fontSize: 42,
@@ -208,10 +214,18 @@ class FinancialBudgetScreen extends StatelessWidget {
                                 accountController.amountController.text);
 
                             if (newBalance != null) {
-                              accountController
-                                  .updateAccountBalance(newBalance);
-                              accountController.amountController.clear();
-                              Navigator.pop(context);
+                              if (newBalance > 1000000000) {
+                                Get.snackbar(
+                                  'Error',
+                                  'The balance cannot exceed 100 million.',
+                                  backgroundColor: style.ColorTheme.redColor,
+                                );
+                              } else {
+                                accountController
+                                    .updateAccountBalance(newBalance);
+                                accountController.amountController.clear();
+                                Navigator.pop(context);
+                              }
                             } else {
                               Get.snackbar(
                                 'Error',
@@ -289,10 +303,10 @@ class FinancialBudgetScreen extends StatelessWidget {
 
   _header() {
     return Text(
-      "\nFinancial\nbudget",
+      "Financial\nbudget",
       style: GoogleFonts.spaceGrotesk(
         fontWeight: FontWeight.w700,
-        fontSize: 42,
+        fontSize: 40,
         fontStyle: FontStyle.normal,
       ),
     );

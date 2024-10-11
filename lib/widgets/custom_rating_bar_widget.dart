@@ -14,9 +14,9 @@ class CustomRatingBarWidget extends StatelessWidget {
       children: List.generate(10, (index) {
         bool isFilled = index < filledContainers;
         return Container(
-          margin: EdgeInsets.only(right: 5),
-          height: 12,
-          width: 12,
+          margin: EdgeInsets.only(right: 3),
+          height: 11,
+          width: 11,
           decoration: BoxDecoration(
             color: isFilled ? style.ColorTheme.lemonColor : Colors.white,
             border: Border.all(

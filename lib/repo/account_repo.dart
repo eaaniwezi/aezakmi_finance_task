@@ -15,9 +15,9 @@ class AccountRepo {
     var box = await _openAccountBox();
     var account = box.get('account');
     double? balance = account?.accountBalance;
-    if (balance != null && balance.abs() > 9999) {
-      return 0.0;
-    }
+    // if (balance != null && balance.abs() > 9999999) {
+    //   return 0.0;
+    // }
 
     return balance;
   }

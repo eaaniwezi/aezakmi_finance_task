@@ -1,5 +1,5 @@
 // ignore_for_file: prefer_const_constructors
-
+import 'package:intl/intl.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -59,8 +59,10 @@ class TransactionHistoryCard extends StatelessWidget {
           Spacer(),
           Text(
             model.isCost
-                ? '— \$ ${model.amount.abs()}'
-                : '+ \$ ${model.amount.abs()}',
+                // ? '— \$ ${model.amount.abs()}'
+                // : '+ \$ ${model.amount.abs()}',
+                ? '— \$ ${NumberFormat.compact().format(model.amount.abs())}'
+                : '+ \$ ${NumberFormat.compact().format(model.amount.abs())}',
             style: GoogleFonts.spaceGrotesk(
               fontWeight: FontWeight.w700,
               fontSize: 26,
