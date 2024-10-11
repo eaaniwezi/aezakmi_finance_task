@@ -1,7 +1,7 @@
 // ignore_for_file: avoid_print
 
-import 'package:aezakmi_finance_task/repo/fin_goals_repo.dart';
 import 'package:get/get.dart';
+import 'package:aezakmi_finance_task/repo/fin_goals_repo.dart';
 import 'package:aezakmi_finance_task/models/fin_goals_model.dart';
 
 class FinancialGoalsController extends GetxController {

@@ -1,6 +1,5 @@
 // ignore_for_file: prefer_const_constructors
 
-import 'package:aezakmi_finance_task/controllers/account_controller.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
@@ -9,6 +8,7 @@ import 'package:aezakmi_finance_task/models/category_model.dart';
 import 'package:aezakmi_finance_task/repo/transcation_repo.dart';
 import 'package:aezakmi_finance_task/models/transcation_model.dart';
 import 'package:aezakmi_finance_task/const/color_theme.dart' as style;
+import 'package:aezakmi_finance_task/controllers/account_controller.dart';
 import 'package:aezakmi_finance_task/screens/main_screens/main_screen.dart';
 
 class AddTransactionController extends GetxController {

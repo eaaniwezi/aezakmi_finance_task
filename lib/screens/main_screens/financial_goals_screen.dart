@@ -7,7 +7,6 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:aezakmi_finance_task/const/color_theme.dart' as style;
 import 'package:aezakmi_finance_task/controllers/fin_goals_controller.dart';
-import 'package:aezakmi_finance_task/screens/fin_goals_screens/edit_goals_screen.dart';
 import 'package:aezakmi_finance_task/screens/fin_goals_screens/add_history_screen.dart';
 
 class FinancialGoalsScreen extends StatelessWidget {
@@ -17,8 +16,9 @@ class FinancialGoalsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: style.ColorTheme.lightLemonColor,
-        body: Obx(() {
+      backgroundColor: style.ColorTheme.lightLemonColor,
+      body: Obx(
+        () {
           var goals = _controller.financialGoals;
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -42,14 +42,9 @@ class FinancialGoalsScreen extends StatelessWidget {
                       var model = goals[index];
 
                       double percentValue = 0.0;
-                      // if (model.amount > 0) {
-                      //   percentValue = (model.availableAmount / model.amount);
-                      // }
-
                       if (model.percentValue != null) {
-                        percentValue = model.percentValue!.clamp(0.0, 1.0);
-                      } else {
-                        percentValue = 0.0;
+                        percentValue =
+                            (model.percentValue! / 100).clamp(0.0, 1.0);
                       }
 
                       return GestureDetector(
@@ -78,9 +73,7 @@ class FinancialGoalsScreen extends StatelessWidget {
                                   lineWidth: 5.0,
                                   percent: percentValue,
                                   center: _percentText(
-                                    model.percentValue == null
-                                        ? "0%"
-                                        : "${model.percentValue.toString()}%",
+                                    "${model.percentValue?.toStringAsFixed(0)}%",
                                     // "${(percentValue * 100).toStringAsFixed(0)}%",
                                   ), // Display percentage
                                   progressColor: style.ColorTheme.lemonColor,
@@ -121,7 +114,9 @@ class FinancialGoalsScreen extends StatelessWidget {
               ],
             ),
           );
-        }));
+        },
+      ),
+    );
   }
 
   _dateContainer({required String label, required String title}) {

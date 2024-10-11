@@ -6,10 +6,20 @@ class AccountRepo {
     return await Hive.openBox<AccountModel>('accountBox');
   }
 
+  // Future<double?> getAccountBalance() async {
+  //   var box = await _openAccountBox();
+  //   var account = box.get('account');
+  //   return account?.accountBalance;
+  // }
   Future<double?> getAccountBalance() async {
     var box = await _openAccountBox();
     var account = box.get('account');
-    return account?.accountBalance;
+    double? balance = account?.accountBalance;
+    if (balance != null && balance.abs() > 9999) {
+      return 0.0;
+    }
+
+    return balance;
   }
 
   Future<void> updateAccountBalance(double newBalance) async {

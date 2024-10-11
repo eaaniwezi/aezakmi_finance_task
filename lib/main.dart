@@ -5,6 +5,7 @@ import 'package:aezakmi_finance_task/models/account_model.dart';
 import 'package:aezakmi_finance_task/models/category_model.dart';
 import 'package:aezakmi_finance_task/models/fin_goals_model.dart';
 import 'package:aezakmi_finance_task/models/transcation_model.dart';
+import 'package:aezakmi_finance_task/models/goals_history_model.dart';
 import 'package:aezakmi_finance_task/controllers/account_controller.dart';
 import 'package:aezakmi_finance_task/screens/intro_screens/splash_screen.dart';
 
@@ -17,6 +18,7 @@ void main() async {
   Hive.registerAdapter(AccountModelAdapter());
   Hive.registerAdapter(CategoryModelAdapter());
   Hive.registerAdapter(FinGoalsModelAdapter());
+  Hive.registerAdapter(GoalsHistoryModelAdapter());
 
   // Opening all the necessary boxes
   await Hive.openBox<FinGoalsModel>('fin_goals');
@@ -38,3 +40,5 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
+// flutter build apk --split-per-abi

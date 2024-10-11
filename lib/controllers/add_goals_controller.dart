@@ -18,8 +18,7 @@ class AddGoalsController extends GetxController {
   RxDouble ratings = 0.0.obs;
   final TextEditingController titleController = TextEditingController();
   final TextEditingController amountController = TextEditingController();
-  // final TextEditingController availableAmountController =
-  //     TextEditingController();
+
   final TextEditingController selectStartDateController =
       TextEditingController();
   final TextEditingController selectEndDateController = TextEditingController();
@@ -37,7 +36,6 @@ class AddGoalsController extends GetxController {
     ratings.value = 0.0;
     titleController.clear();
     amountController.clear();
-    // availableAmountController.clear();
     selectStartDateController.clear();
     selectEndDateController.clear();
     isFormFilled.value = false;
@@ -46,7 +44,6 @@ class AddGoalsController extends GetxController {
   void _checkFormFilled() {
     isFormFilled.value = titleController.text.isNotEmpty &&
         amountController.text.isNotEmpty &&
-        // availableAmountController.text.isNotEmpty &&
         selectStartDateController.text.isNotEmpty &&
         selectEndDateController.text.isNotEmpty;
   }
@@ -61,7 +58,6 @@ class AddGoalsController extends GetxController {
     try {
       if (isFormFilled.value &&
           isFloat(amountController.text) &&
-          // isFloat(availableAmountController.text) &&
           ratings.value > 0.0) {
         DateTime startDate =
             DateFormat('dd.MM.yyyy').parse(selectStartDateController.text);
@@ -78,13 +74,10 @@ class AddGoalsController extends GetxController {
         var uuid = Uuid();
         String goalId = uuid.v4();
         double amount = double.tryParse(amountController.text) ?? 0.0;
-        // double availableAmount =
-        //     double.tryParse(availableAmountController.text) ?? 0.0;
         var goalModel = FinGoalsModel(
           id: goalId,
           title: titleController.text,
           amount: amount,
-          // availableAmount: availableAmount,
           startDate: selectStartDateController.text,
           endDate: selectEndDateController.text,
           priority: ratings.value,

@@ -6,21 +6,22 @@ import 'package:uuid/uuid.dart';
 import 'package:flutter/material.dart';
 import 'package:aezakmi_finance_task/repo/fin_goals_repo.dart';
 import 'package:aezakmi_finance_task/models/fin_goals_model.dart';
+import 'package:aezakmi_finance_task/models/goals_history_model.dart';
 import 'package:aezakmi_finance_task/const/color_theme.dart' as style;
 import 'package:aezakmi_finance_task/screens/main_screens/main_screen.dart';
 import 'package:aezakmi_finance_task/controllers/fin_goals_controller.dart';
 
 class EditGoalsController extends GetxController {
   final finGoalsRepo = FinGoalsRepo();
-  var finGoal = Rxn<FinGoalsModel>();
+  // var finGoal = Rxn<FinGoalsModel>();
+
+  Rx<FinGoalsModel?> finGoal = Rx<FinGoalsModel?>(null);
 
   var isFormFilled = false.obs;
 
   RxDouble ratings = 0.0.obs;
   final TextEditingController titleController = TextEditingController();
   final TextEditingController amountController = TextEditingController();
-  // final TextEditingController availableAmountController =
-  //     TextEditingController();
   final TextEditingController selectStartDateController =
       TextEditingController();
   final TextEditingController selectEndDateController = TextEditingController();
@@ -31,12 +32,6 @@ class EditGoalsController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    // ratings.value = finGoal.value!.priority;
-    // titleController.text = finGoal.value!.title;
-    // amountController.text = finGoal.value!.amount.toString();
-    // availableAmountController.text = finGoal.value!.availableAmount.toString();
-    // selectStartDateController.text = finGoal.value!.startDate;
-    // selectEndDateController.text = finGoal.value!.endDate;
     titleController.addListener(_checkFormFilled);
     amountController.addListener(_checkFormFilled);
     selectStartDateController.addListener(_checkFormFilled);
@@ -47,7 +42,6 @@ class EditGoalsController extends GetxController {
     ratings.value = 0.0;
     titleController.clear();
     amountController.clear();
-    // availableAmountController.clear();
     selectStartDateController.clear();
     selectEndDateController.clear();
     isFormFilled.value = false;
@@ -56,7 +50,6 @@ class EditGoalsController extends GetxController {
   void _checkFormFilled() {
     isFormFilled.value = titleController.text.isNotEmpty &&
         amountController.text.isNotEmpty &&
-        // availableAmountController.text.isNotEmpty &&
         selectStartDateController.text.isNotEmpty &&
         selectEndDateController.text.isNotEmpty;
   }
@@ -71,7 +64,6 @@ class EditGoalsController extends GetxController {
     try {
       if (isFormFilled.value &&
           isFloat(amountController.text) &&
-          // isFloat(availableAmountController.text) &&
           ratings.value > 0.0) {
         DateTime startDate =
             DateFormat('dd.MM.yyyy').parse(selectStartDateController.text);
@@ -88,13 +80,10 @@ class EditGoalsController extends GetxController {
         var uuid = Uuid();
         String goalId = uuid.v4();
         double amount = double.tryParse(amountController.text) ?? 0.0;
-        // double availableAmount =
-        //     double.tryParse(availableAmountController.text) ?? 0.0;
         var goalModel = FinGoalsModel(
           id: goalId,
           title: titleController.text,
           amount: amount,
-          // availableAmount: availableAmount,
           startDate: selectStartDateController.text,
           endDate: selectEndDateController.text,
           priority: ratings.value,
@@ -110,6 +99,12 @@ class EditGoalsController extends GetxController {
           clearForm();
           Get.find<FinancialGoalsController>().getAllFinancialGoals();
           Get.to(() => MainScreen());
+        } else {
+          Get.snackbar(
+            'Error',
+            'An error occurred while saving the goal:}',
+            backgroundColor: style.ColorTheme.redColor,
+          );
         }
       } else {
         Get.snackbar(
@@ -127,25 +122,129 @@ class EditGoalsController extends GetxController {
     }
   }
 
+  // void addGoals() async {
+  //   try {
+  //     String formattedDate = DateFormat('dd.MM.yyyy').format(DateTime.now());
+  //     var newBalance = double.tryParse(newCollectedAmountController.text);
+
+  //     var newHistory =
+  //         GoalsHistoryModel(date: formattedDate, amount: newBalance!);
+
+  //     var res = await addGoalToHistory(finGoal.value!.id, newHistory);
+
+  //     if (res == true) {
+  //       Get.snackbar(
+  //         'Success',
+  //         'Goal saved successfully!',
+  //         backgroundColor: style.ColorTheme.lemonColor,
+  //       );
+
+  //       var goal = await finGoalsRepo.getGoalById(finGoal.value!.id);
+  //       if (goal != null) {
+  //         finGoal.value = goal;
+  //         update();
+  //       }
+  //     } else {
+  //       Get.snackbar(
+  //         'Error',
+  //         'An error occurred while saving the goal:}',
+  //         backgroundColor: style.ColorTheme.redColor,
+  //       );
+  //     }
+  //   } catch (e) {
+  //     Get.snackbar(
+  //       'Error',
+  //       'An error occurred while add the goal: ${e.toString()}',
+  //       backgroundColor: style.ColorTheme.redColor,
+  //     );
+  //   }
+  // }
+
+  void addGoals() async {
+    try {
+      String formattedDate = DateFormat('dd.MM.yyyy').format(DateTime.now());
+      var newBalance = double.tryParse(newCollectedAmountController.text);
+      if (newBalance == null) {
+        Get.snackbar(
+          'Error',
+          'Please enter a valid amount.',
+          backgroundColor: style.ColorTheme.redColor,
+        );
+        return;
+      }
+      var newHistory =
+          GoalsHistoryModel(date: formattedDate, amount: newBalance);
+      var res = await addGoalToHistory(finGoal.value!.id, newHistory);
+      if (res == true) {
+        Get.snackbar(
+          'Success',
+          'Amount added to goal successfully!',
+          backgroundColor: style.ColorTheme.lemonColor,
+        );
+
+        var goal = await finGoalsRepo.getGoalById(finGoal.value!.id);
+        if (goal != null) {
+          finGoal.value = goal;
+          update();
+        }
+      } else {
+        Get.snackbar(
+          'Error',
+          'An error occurred while saving the goal.',
+          backgroundColor: style.ColorTheme.redColor,
+        );
+      }
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'An error occurred while adding the goal: ${e.toString()}',
+        backgroundColor: style.ColorTheme.redColor,
+      );
+    }
+  }
+
   Future<bool> updateGoals(goalId, updatedGoal) async {
     return await finGoalsRepo.updateGoalById(goalId, updatedGoal);
   }
 
+  Future<bool> addGoalToHistory(goalId, newHistory) async {
+    return await finGoalsRepo.addGoalToHistory(goalId, newHistory);
+  }
+
+  // getGoal(goalId) async {
+  //   try {
+  //     var goal = await finGoalsRepo.getGoalById(goalId);
+  //     if (goal != null) {
+  //       finGoal.value = goal;
+
+  //       ratings.value = finGoal.value!.priority;
+  //       titleController.text = finGoal.value!.title;
+  //       amountController.text = finGoal.value!.amount.toString();
+  //       // availableAmountController.text =
+  //       //     finGoal.value!.availableAmount.toString();
+  //       selectStartDateController.text = finGoal.value!.startDate;
+  //       selectEndDateController.text = finGoal.value!.endDate;
+  //     }
+  //   } catch (e) {}
+  // }
   getGoal(goalId) async {
     try {
       var goal = await finGoalsRepo.getGoalById(goalId);
       if (goal != null) {
-        finGoal.value = goal;
-
+        finGoal.value = goal; // This should notify the UI
         ratings.value = finGoal.value!.priority;
         titleController.text = finGoal.value!.title;
         amountController.text = finGoal.value!.amount.toString();
-        // availableAmountController.text =
-        //     finGoal.value!.availableAmount.toString();
         selectStartDateController.text = finGoal.value!.startDate;
         selectEndDateController.text = finGoal.value!.endDate;
       }
-    } catch (e) {}
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'An error occurred while fetching the goal: ${e.toString()}',
+        backgroundColor: style.ColorTheme.redColor,
+      );
+    }
   }
 
   Future<void> pickStartDate(BuildContext context) async {

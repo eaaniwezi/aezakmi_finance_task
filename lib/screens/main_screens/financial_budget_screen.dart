@@ -41,6 +41,7 @@ class FinancialBudgetScreen extends StatelessWidget {
                           return TransactionHistoryCard(model: model);
                         },
                       ),
+                SizedBox(height: 50)
               ],
             ),
           );
@@ -77,7 +78,7 @@ class FinancialBudgetScreen extends StatelessWidget {
 
   _budgetContainer(BuildContext context) {
     return Obx(() {
-      var balance = accountController.accountBalance.value.toString();
+      var balance = accountController.accountBalance.value;
       return Container(
         height: 135,
         decoration: BoxDecoration(
@@ -89,6 +90,7 @@ class FinancialBudgetScreen extends StatelessWidget {
           children: [
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   "Balance",
@@ -100,7 +102,7 @@ class FinancialBudgetScreen extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  "\$ $balance", // Dynamically displaying balance
+                  "\$ ${balance}",
                   style: GoogleFonts.spaceGrotesk(
                     fontWeight: FontWeight.w700,
                     fontSize: 42,

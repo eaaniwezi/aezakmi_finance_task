@@ -1,9 +1,9 @@
-import 'package:aezakmi_finance_task/screens/main_screens/main_screen.dart';
+import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:aezakmi_finance_task/const/color_theme.dart' as style;
-import 'package:get/get.dart';
 import 'package:aezakmi_finance_task/controllers/account_controller.dart';
+import 'package:aezakmi_finance_task/screens/main_screens/main_screen.dart';
 import 'package:aezakmi_finance_task/screens/intro_screens/onboarding_screen.dart';
 
 class SplashScreen extends StatelessWidget {
@@ -11,14 +11,12 @@ class SplashScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Access the AccountController
     final accountController = Get.find<AccountController>();
 
-    // This will check if it's the first time user and navigate accordingly
     Future.delayed(const Duration(seconds: 2), () async {
       bool isFirstTime = await accountController.isFirstTimeUserFlag() ?? true;
       if (isFirstTime) {
-        Get.offAll(OnboardingScreen());
+        Get.offAll(const OnboardingScreen());
       } else {
         Get.offAll(MainScreen());
       }

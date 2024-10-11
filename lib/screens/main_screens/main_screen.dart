@@ -1,7 +1,5 @@
 // ignore_for_file: prefer_const_constructors, deprecated_member_use
 
-import 'package:aezakmi_finance_task/screens/fin_goals_screens/add_goals_screen.dart';
-import 'package:aezakmi_finance_task/screens/home_screens/add_transaction_screen.dart';
 import 'package:get/get.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +7,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:aezakmi_finance_task/const/color_theme.dart' as style;
 import 'package:aezakmi_finance_task/controllers/bottom_navbar_controller.dart';
 import 'package:aezakmi_finance_task/screens/main_screens/settings_screen.dart';
+import 'package:aezakmi_finance_task/screens/fin_goals_screens/add_goals_screen.dart';
+import 'package:aezakmi_finance_task/screens/home_screens/add_transaction_screen.dart';
 import 'package:aezakmi_finance_task/screens/main_screens/financial_goals_screen.dart';
 import 'package:aezakmi_finance_task/screens/main_screens/financial_budget_screen.dart';
 

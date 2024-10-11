@@ -1,83 +1,168 @@
-// ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors
-
-import 'package:aezakmi_finance_task/controllers/edit_goals_controller.dart';
-import 'package:aezakmi_finance_task/models/fin_goals_model.dart';
-import 'package:aezakmi_finance_task/widgets/button_widget.dart';
-import 'package:aezakmi_finance_task/widgets/custom_rating_bar_widget.dart';
+import 'dart:async';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:percent_indicator/circular_percent_indicator.dart';
+import 'package:aezakmi_finance_task/models/fin_goals_model.dart';
+import 'package:aezakmi_finance_task/widgets/button_widget.dart';
 import 'package:aezakmi_finance_task/const/color_theme.dart' as style;
 import 'package:aezakmi_finance_task/widgets/custom_appbar_widget.dart';
+import 'package:aezakmi_finance_task/widgets/custom_rating_bar_widget.dart';
 import 'package:aezakmi_finance_task/controllers/fin_goals_controller.dart';
-import 'package:aezakmi_finance_task/screens/fin_goals_screens/edit_goals_screen.dart';
+import 'package:aezakmi_finance_task/controllers/add_history_controller.dart';
 
-class AddHistoryScreen extends StatelessWidget {
+class AddHistoryScreen extends StatefulWidget {
   final FinGoalsModel model;
-  AddHistoryScreen({super.key, required this.model});
+  const AddHistoryScreen({super.key, required this.model});
+
+  @override
+  State<AddHistoryScreen> createState() => _AddHistoryScreenState();
+}
+
+class _AddHistoryScreenState extends State<AddHistoryScreen> {
+  Timer? _timer;
+  final addHistoryController = Get.put(AddHistoryController());
+  @override
+  void initState() {
+    super.initState();
+    addHistoryController.getGoal(widget.model.id);
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      addHistoryController.getGoal(widget.model.id);
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    addHistoryController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final editController = Get.put(EditGoalsController());
     return Scaffold(
-      floatingActionButton: _addButton(editController, context),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      backgroundColor: style.ColorTheme.lightLemonColor,
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: ListView(
-          children: [
-            CustomAppbarWidget(title: ""),
-            _textContainer(model.title),
-            _dateText("${model.startDate}-${model.endDate}"),
-            SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _emptyContainer(
-                  context: context,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _percentText("${model.percentValue.toString()}%"),
-                        SizedBox(height: 10),
-                        CustomRatingBarWidget(percentValue: 1.0)
-                      ],
-                    ),
-                  ),
-                ),
-                //
-                _emptyContainer(
+        floatingActionButton: _addButton(addHistoryController, context),
+        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+        backgroundColor: style.ColorTheme.lightLemonColor,
+        body: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: ListView(
+            children: [
+              const CustomAppbarWidget(title: ""),
+              _textContainer(widget.model.title),
+              _dateText("${widget.model.startDate}-${widget.model.endDate}"),
+              const SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _emptyContainer(
                     context: context,
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _textTitleContainer("Collected"),
-                          SizedBox(width: 10),
-                          _dateText("\$ 0"),
-                          SizedBox(width: 10),
-                          _textTitleContainer("Amount"),
-                          SizedBox(width: 10),
-                          _dateText("\$ ${model.amount}")
+                          Obx(() {
+                            var fetchedModel =
+                                addHistoryController.finGoal.value;
+                            if (fetchedModel != null) {
+                              return _percentText(
+                                "${fetchedModel.percentValue.toString()}%",
+                              );
+                            } else {
+                              return _percentText("%");
+                            }
+                          }),
+                          const SizedBox(height: 10),
+                          Obx(() {
+                            var fetchedModel =
+                                addHistoryController.finGoal.value;
+                            if (fetchedModel != null) {
+                              return CustomRatingBarWidget(
+                                  percentValue:
+                                      (fetchedModel.percentValue! / 100)
+                                          .clamp(0.0, 1.0));
+                            } else {
+                              return CustomRatingBarWidget(percentValue: 0.0);
+                            }
+                          }),
                         ],
                       ),
-                    ))
-              ],
-            ),
-            _textContainer("History"),
-            _noHistory(),
-          ],
-        ),
-      ),
-    );
+                    ),
+                  ),
+                  //
+                  _emptyContainer(
+                      context: context,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _textTitleContainer("Collected"),
+                            const SizedBox(width: 10),
+                            Obx(() {
+                              var fetchedModel =
+                                  addHistoryController.finGoal.value;
+                              if (fetchedModel != null &&
+                                  fetchedModel.totalAmountCollected != null) {
+                                return _dateText(
+                                  "\$ ${fetchedModel.totalAmountCollected.toString()}",
+                                );
+                              } else {
+                                return _dateText("\$ ");
+                              }
+                            }),
+                            const SizedBox(width: 10),
+                            _textTitleContainer("Amount"),
+                            const SizedBox(width: 10),
+                            _dateText(
+                              "\$ ${widget.model.amount}",
+                            )
+                          ],
+                        ),
+                      ))
+                ],
+              ),
+              const SizedBox(height: 30),
+              _textContainer("History"),
+              const SizedBox(height: 20),
+              Obx(() {
+                var fetchedModel = addHistoryController.finGoal.value;
+                if (fetchedModel != null && fetchedModel.history != null) {
+                  return fetchedModel.history!.isEmpty
+                      ? _noHistory()
+                      : Column(
+                          children: fetchedModel.history!.map((historyModel) {
+                            return Container(
+                              height: 49,
+                              margin: const EdgeInsets.only(bottom: 10),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 15),
+                                child: Row(
+                                  children: [
+                                    _dateText(historyModel.date.toString()),
+                                    const Spacer(),
+                                    _textContainer(
+                                        "+ \$ ${historyModel.amount.toStringAsPrecision(5)}")
+                                  ],
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        );
+                }
+                return _noHistory();
+              }),
+              const SizedBox(height: 90)
+            ],
+          ),
+        ));
   }
 
   _textTitleContainer(label) {
@@ -106,124 +191,16 @@ class AddHistoryScreen extends StatelessWidget {
     );
   }
 
-  _addButton(EditGoalsController editController, BuildContext context) {
+  _addButton(AddHistoryController addHistoryController, BuildContext context) {
     return CircleAvatar(
       radius: 30,
       backgroundColor: style.ColorTheme.blackColor,
       child: IconButton(
-        icon: Icon(Icons.add, color: Colors.white),
+        icon: const Icon(Icons.add, color: Colors.white),
         onPressed: () {
-          showModalBottomSheet(
+          _show(
             context: context,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.vertical(
-                top: Radius.circular(20),
-              ),
-            ),
-            backgroundColor: Colors.transparent,
-            isScrollControlled: true,
-            builder: (BuildContext context) {
-              return Padding(
-                padding: EdgeInsets.only(
-                    bottom: MediaQuery.of(context).viewInsets.bottom),
-                child: SingleChildScrollView(
-                  child: Container(
-                      decoration: BoxDecoration(
-                        color: style.ColorTheme.blackColor,
-                        borderRadius: BorderRadius.vertical(
-                          top: Radius.circular(20),
-                        ),
-                      ),
-                      height: 250,
-                      child: Padding(
-                        padding: const EdgeInsets.all(20),
-                        child: Column(
-                          children: [
-                            _modalHeader(context),
-                            TextField(
-                              style: GoogleFonts.spaceGrotesk(
-                                fontWeight: FontWeight.w700,
-                                fontSize: 42,
-                                fontStyle: FontStyle.normal,
-                                color: Colors.white,
-                              ),
-                              cursorColor: Colors.white,
-                              controller:
-                                  editController.newCollectedAmountController,
-                              decoration: InputDecoration(
-                                hintText: '0',
-                                hintStyle: GoogleFonts.spaceGrotesk(
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: 42,
-                                  fontStyle: FontStyle.normal,
-                                  color: Colors.grey,
-                                ),
-                                prefixIcon: Padding(
-                                  padding: EdgeInsets.only(left: 12, top: 8),
-                                  child: Text(
-                                    '\$',
-                                    style: GoogleFonts.spaceGrotesk(
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 42,
-                                      fontStyle: FontStyle.normal,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
-                                border: InputBorder.none,
-                                contentPadding: EdgeInsets.only(
-                                    left: 0, top: 12, bottom: 8),
-                              ),
-                              keyboardType: TextInputType.numberWithOptions(
-                                  decimal: true),
-                            ),
-                            const SizedBox(height: 20),
-                            ButtonWidget(
-                              label: "Save",
-                              isColored: true,
-                              function: () {
-                                bool isFloat(String value) {
-                                  if (value.isEmpty) return false;
-                                  final regex = RegExp(r'^-?\d+(\.\d+)?$');
-                                  return regex.hasMatch(value);
-                                }
-
-                                if (editController.newCollectedAmountController
-                                        .text.isNotEmpty &&
-                                    isFloat(editController
-                                        .newCollectedAmountController.text)) {
-                                  var newBalance = double.tryParse(
-                                      editController
-                                          .newCollectedAmountController.text);
-
-                                  if (newBalance != null) {
-                                    // accountController
-                                    //     .updateAccountBalance(newBalance);
-                                    // accountController.amountController.clear();
-                                    // Navigator.pop(context);
-                                  } else {
-                                    Get.snackbar(
-                                      'Error',
-                                      'Please enter a valid number.',
-                                      backgroundColor:
-                                          style.ColorTheme.redColor,
-                                    );
-                                  }
-                                } else {
-                                  Get.snackbar(
-                                    'Error',
-                                    'Please enter a valid amount.',
-                                    backgroundColor: style.ColorTheme.redColor,
-                                  );
-                                }
-                              },
-                            )
-                          ],
-                        ),
-                      )),
-                ),
-              );
-            },
+            addHistoryController: addHistoryController,
           );
         },
       ),
@@ -238,7 +215,7 @@ class AddHistoryScreen extends StatelessWidget {
           onTap: () {
             Navigator.pop(context);
           },
-          child: CircleAvatar(
+          child: const CircleAvatar(
             radius: 20,
             backgroundColor: Colors.white,
             child: Icon(
@@ -256,7 +233,7 @@ class AddHistoryScreen extends StatelessWidget {
             color: Colors.white,
           ),
         ),
-        CircleAvatar(
+        const CircleAvatar(
           radius: 20,
           backgroundColor: Colors.transparent,
           child: Icon(
@@ -274,7 +251,7 @@ class AddHistoryScreen extends StatelessWidget {
       children: [
         Image.asset("assets/pics/wallet.png"),
         _textContainer("No transactions"),
-        _dateText("Press + to add")
+        _tapHereText("Press + to add")
       ],
     );
   }
@@ -291,9 +268,27 @@ class AddHistoryScreen extends StatelessWidget {
     );
   }
 
+  _tapHereText(text) {
+    return GestureDetector(
+      onTap: () {
+        _show(context: context, addHistoryController: addHistoryController);
+      },
+      child: Text(
+        text,
+        style: GoogleFonts.spaceGrotesk(
+          fontWeight: FontWeight.w400,
+          fontSize: 14,
+          fontStyle: FontStyle.normal,
+          color: style.ColorTheme.blackColor,
+        ),
+      ),
+    );
+  }
+
   _dateText(text) {
     return Text(
       text,
+      overflow: TextOverflow.ellipsis,
       style: GoogleFonts.spaceGrotesk(
         fontWeight: FontWeight.w400,
         fontSize: 14,
@@ -312,6 +307,128 @@ class AddHistoryScreen extends StatelessWidget {
         fontStyle: FontStyle.normal,
         color: style.ColorTheme.blackColor,
       ),
+    );
+  }
+
+  _show(
+      {required BuildContext context,
+      required AddHistoryController addHistoryController}) {
+    return showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(20),
+        ),
+      ),
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (BuildContext context) {
+        return Padding(
+          padding:
+              EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+          child: SingleChildScrollView(
+            child: Container(
+                decoration: const BoxDecoration(
+                  color: style.ColorTheme.blackColor,
+                  borderRadius: BorderRadius.vertical(
+                    top: Radius.circular(20),
+                  ),
+                ),
+                height: 250,
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    children: [
+                      _modalHeader(context),
+                      TextField(
+                        style: GoogleFonts.spaceGrotesk(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 42,
+                          fontStyle: FontStyle.normal,
+                          color: Colors.white,
+                        ),
+                        cursorColor: Colors.white,
+                        controller:
+                            addHistoryController.newCollectedAmountController,
+                        decoration: InputDecoration(
+                          hintText: '0',
+                          hintStyle: GoogleFonts.spaceGrotesk(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 42,
+                            fontStyle: FontStyle.normal,
+                            color: Colors.grey,
+                          ),
+                          prefixIcon: Padding(
+                            padding: const EdgeInsets.only(left: 12, top: 8),
+                            child: Text(
+                              '\$',
+                              style: GoogleFonts.spaceGrotesk(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 42,
+                                fontStyle: FontStyle.normal,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                          border: InputBorder.none,
+                          contentPadding: const EdgeInsets.only(
+                              left: 0, top: 12, bottom: 8),
+                        ),
+                        keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true),
+                      ),
+                      const SizedBox(height: 20),
+                      ButtonWidget(
+                        label: "Save",
+                        isColored: true,
+                        function: () async {
+                          bool isFloat(String value) {
+                            if (value.isEmpty) return false;
+                            final regex = RegExp(r'^-?\d+(\.\d+)?$');
+                            return regex.hasMatch(value);
+                          }
+
+                          if (addHistoryController.newCollectedAmountController
+                                  .text.isNotEmpty &&
+                              isFloat(addHistoryController
+                                  .newCollectedAmountController.text)) {
+                            var newBalance = double.tryParse(
+                                addHistoryController
+                                    .newCollectedAmountController.text);
+
+                            if (newBalance != null) {
+                              await addHistoryController.addGoals();
+
+                              await addHistoryController
+                                  .getGoal(widget.model.id);
+                              addHistoryController.finGoal.refresh();
+                              addHistoryController.newCollectedAmountController
+                                  .clear();
+                              Get.find<FinancialGoalsController>()
+                                  .getAllFinancialGoals();
+                              Navigator.pop(context);
+                            } else {
+                              Get.snackbar(
+                                'Error',
+                                'Please enter a valid number.',
+                                backgroundColor: style.ColorTheme.redColor,
+                              );
+                            }
+                          } else {
+                            Get.snackbar(
+                              'Error',
+                              'Please enter a valid amount.',
+                              backgroundColor: style.ColorTheme.redColor,
+                            );
+                          }
+                        },
+                      )
+                    ],
+                  ),
+                )),
+          ),
+        );
+      },
     );
   }
 }

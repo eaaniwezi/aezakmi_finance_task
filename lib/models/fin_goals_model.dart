@@ -54,8 +54,10 @@ class FinGoalsModel {
       }
       percentValue = (totalHistoryAmount / amount) * 100;
     }
+
     if (percentValue != null) {
       percentValue = percentValue!.clamp(0.0, 100.0);
+      percentValue = double.parse(percentValue!.toStringAsFixed(2));
     }
   }
 
@@ -68,6 +70,10 @@ class FinGoalsModel {
         totalHistoryAmount += historyItem.amount;
       }
       totalAmountCollected = totalHistoryAmount;
+    }
+    if (totalAmountCollected != null) {
+      totalAmountCollected =
+          double.parse(totalAmountCollected!.toStringAsFixed(2));
     }
   }
 }
